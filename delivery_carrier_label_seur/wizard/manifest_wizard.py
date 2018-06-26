@@ -2,9 +2,15 @@
 # © 2015 FactorLibre - Ismael Calvo <ismael.calvo@factorlibre.com>
 # © 2017 PESOL - Angel Moya <angel.moya@pesol.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from openerp import models, api, fields, _
-from seur.picking import Picking
-from openerp.exceptions import Warning
+from odoo import models, api, fields, _
+from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
+try:
+    from seur.picking import Picking
+except (ImportError, IOError) as err:
+    _logger.debug(err)
 
 
 class ManifestWizard(models.TransientModel):
@@ -35,7 +41,7 @@ class ManifestWizard(models.TransientModel):
             ) as seur_picking:
                 manifiesto = seur_picking.manifiesto(data)
             if not manifiesto:
-                raise Warning(
+                raise UserError(
                     _("Manifest no generated"))
 
             self.write({

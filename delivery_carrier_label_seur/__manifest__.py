@@ -13,7 +13,7 @@
     "application": False,
     "installable": True,
     "external_dependencies": {
-        "python": ['seur'],
+        "python": ['seur', 'unidecode'],
     },
     "depends": [
         "delivery",

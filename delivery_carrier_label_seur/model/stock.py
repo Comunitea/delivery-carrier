@@ -3,17 +3,18 @@
 # © 2017 PESOL - Angel Moya <angel.moya@pesol.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import logging
-from unidecode import unidecode
-# from urllib2 import HTTPError
-
-from openerp import models, fields, api, exceptions
-from openerp.tools.translate import _
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 try:
     from seur.picking import Picking
-except ImportError:
-    _logger.debug('Can not `from seur.picking import Picking`.')
+except (ImportError, IOError) as err:
+    _logger.debug(err)
+try:
+    from unidecode import unidecode
+except (ImportError, IOError) as err:
+    _logger.debug(err)
 
 
 class ShippingLabel(models.Model):
@@ -31,12 +32,10 @@ class ShippingLabel(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    seur_service_code = fields.Selection(
-        selection='_get_seur_services', string='Seur Service Code',
-        default=False)
-    seur_product_code = fields.Selection(
-        selection='_get_seur_products', string='Seur Product Code',
-        default=False)
+    seur_service_code = fields.Selection(selection='_get_seur_services',
+                                         default=False)
+    seur_product_code = fields.Selection(selection='_get_seur_products',
+                                         default=False)
 
     @api.model
     def create(self, vals):
@@ -45,7 +44,7 @@ class StockPicking(models.Model):
             res.carrier_id_change()
         return res
 
-    @api.one
+    @api.multi
     def write(self, vals):
         res = super(StockPicking, self).write(vals)
         if 'carrier_id' in vals:
@@ -71,9 +70,9 @@ class StockPicking(models.Model):
     def _generate_seur_label(self, package_ids=None):
         self.ensure_one()
         if not self.carrier_id.seur_config_id:
-            raise exceptions.Warning(_('No SEUR Config defined in carrier'))
+            raise UserError(_('No SEUR Config defined in carrier'))
         if not self.picking_type_id.warehouse_id.partner_id:
-            raise exceptions.Warning(
+            raise UserError(
                 _('Please define an address in the %s warehouse') % (
                     self.warehouse_id.name))
 
@@ -92,18 +91,18 @@ class StockPicking(models.Model):
         tracking_ref = False
         label = False
         with Picking(config.username,
-                              config.password,
-                              config.vat,
-                              config.franchise_code,
-                              'Odoo',  # seurid
-                              config.integration_code,
-                              config.accounting_code,
-                              100.0,
-                              seur_context) as picking_api:
+                     config.password,
+                     config.vat,
+                     config.franchise_code,
+                     'Odoo',  # seurid
+                     config.integration_code,
+                     config.accounting_code,
+                     100.0,
+                     seur_context) as picking_api:
             tracking_ref, label, error = picking_api.create(data)
 
             if error:
-                raise exceptions.Warning(
+                raise UserError(
                     _('Error sending label to SEUR\n%s') % error)
 
             self.carrier_tracking_ref = tracking_ref
@@ -112,17 +111,18 @@ class StockPicking(models.Model):
                 label = label.decode('base64')
         if tracking_ref and label:
             return {
-                    'name': self.name + '_' + tracking_ref + '.' + config.file_type,
-                    'file': label,
-                    'file_type': config.file_type
-                    }
+                'name':
+                self.name + '_' + tracking_ref + '.' + config.file_type,
+                'file': label,
+                'file_type': config.file_type
+            }
         else:
             return False
 
     def _get_label_data(self):
         partner = self.partner_id.parent_id or self.partner_id
         if not self.seur_service_code or not self.seur_product_code:
-            raise exceptions.Warning(_(
+            raise UserError(_(
                 'Please select SEUR service and product codes in picking'))
         international = False
         warehouse = self.picking_type_id and \
@@ -171,7 +171,7 @@ class StockPicking(models.Model):
         return data
 
     def warn(self, field, for_str):
-        raise exceptions.Warning(
+        raise UserError(
             _('Please, enter a %s for %s') % (field, for_str))
 
     @api.multi
