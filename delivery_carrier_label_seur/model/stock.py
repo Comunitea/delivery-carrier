@@ -61,7 +61,7 @@ class StockPicking(models.Model):
     @api.onchange('carrier_id')
     def carrier_id_change(self):
         super(StockPicking, self).carrier_id_change()
-        if not self.carrier_id or self.carrier_id.type != 'seur':
+        if not self.carrier_id or self.carrier_id.carrier_type != 'seur':
             return
         carrier = self.carrier_id
         self.seur_service_code = carrier.seur_service_code
