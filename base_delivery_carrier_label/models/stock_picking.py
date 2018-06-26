@@ -30,6 +30,12 @@ class StockPicking(models.Model):
     )
     option_ids = fields.Many2many(comodel_name='delivery.carrier.option',
                                   string='Options')
+    tracking_status_history = fields.Text(readonly=True)
+    tracking_status = fields.Char(readonly=True)
+
+    @api.model
+    def _check_tracking_status_cron(self, days=6):
+        return
 
     @api.multi
     def generate_default_label(self, package_ids=None):
