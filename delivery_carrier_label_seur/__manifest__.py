@@ -13,17 +13,20 @@
     "application": False,
     "installable": True,
     "external_dependencies": {
-        "python": ['seur'],
+        "python": ['unidecode', 'genshi'],
     },
     "depends": [
         "delivery",
         "base_delivery_carrier_label",
+        "base_report_to_printer",
+        'queue_job'
     ],
     "data": [
         "security/ir.model.access.csv",
-        "view/seur_config_view.xml",
-        "view/delivery_view.xml",
-        "view/stock_view.xml"
+        "views/seur_config_view.xml",
+        "views/delivery_view.xml",
+        "views/stock_view.xml",
+        "wizard/zipcode_selector_wizard_view.xml"
     ],
     "demo": [],
     "qweb": []

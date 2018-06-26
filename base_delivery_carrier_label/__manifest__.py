@@ -10,6 +10,7 @@
  'depends': ['delivery'],
  'website': 'http://www.camptocamp.com/',
  'data': [
+     'data/delivery_carrier_cron.xml',
      'views/delivery.xml',
      'views/stock.xml',
      'views/res_config.xml',
