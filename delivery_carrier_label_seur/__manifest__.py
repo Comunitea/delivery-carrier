@@ -21,9 +21,9 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "view/seur_config_view.xml",
-        "view/delivery_view.xml",
-        "view/stock_view.xml"
+        "views/seur_config_view.xml",
+        "views/delivery_view.xml",
+        "views/stock_view.xml"
     ],
     "demo": [],
     "qweb": []
