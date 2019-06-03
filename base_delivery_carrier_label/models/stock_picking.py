@@ -32,6 +32,7 @@ class StockPicking(models.Model):
                                   string='Options')
     tracking_status_history = fields.Text(readonly=True)
     tracking_status = fields.Char(readonly=True)
+    recreate_picking_label = fields.Boolean()
 
     @api.model
     def _check_tracking_status_cron(self, days=6):
@@ -131,6 +132,7 @@ class StockPicking(models.Model):
         It will generate the labels for all the packages of the picking.
 
         """
+        self.write({'recreate_picking_label': False})
         return self.generate_labels()
 
     @api.onchange('carrier_id')
