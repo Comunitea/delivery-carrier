@@ -37,6 +37,8 @@
                         <test_email>${aviso_email}</test_email>
                         <test_sms>${aviso_sms}</test_sms>
                         <id_mercancia>${id_mercancia}</id_mercancia>
+                        <nombre_remitente>${nombre_remitente}</nombre_remitente>
+                        <direccion_remitente>${direccion_remitente}</direccion_remitente>
                     </bulto>
                     </exp>
                 </root>
@@ -56,7 +58,7 @@
             <imp:in6>fichero.xml</imp:in6>
             <imp:in7>${vat}</imp:in7>
             <imp:in8>${franchise}</imp:in8>
-            <imp:in9>-1</imp:in9>
+            <imp:in9>${ccc}</imp:in9>
             <imp:in10>${seurid}</imp:in10>
         </imp:impresionIntegracionConECBWS>
     </soapenv:Body>

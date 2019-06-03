@@ -3,6 +3,7 @@
 # © 2017 PESOL - Angel Moya <angel.moya@pesol.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import logging
+from base64 import b64decode
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.addons.queue_job.job import job
@@ -151,7 +152,6 @@ class StockPicking(models.Model):
         label = False
         error = False
         tracking_ref, label, error = config.create_delivery(data)
-
         self.carrier_tracking_ref = tracking_ref
 
         if self.file_type == 'pdf' and label:
@@ -197,7 +197,6 @@ class StockPicking(models.Model):
             'observaciones': self.note and unidecode(self.note) or '',
             'referencia_expedicion': unidecode(self.name),
             'ref_bulto': '',
-            'direccion_remitente': warehouse.partner_id.street,
             'clave_portes': 'F',
             'clave_reembolso': '',
             'valor_reembolso': '',
@@ -221,6 +220,8 @@ class StockPicking(models.Model):
             partner.mobile and unidecode(partner.mobile) or '',
             'cliente_atencion': unidecode(self.partner_id.name),
             'id_mercancia': international and '400' or '',
+            'nombre_remitente': warehouse.partner_id.name,
+            'direccion_remitente': warehouse.partner_id.street,
         }
         return data
 
@@ -251,8 +252,9 @@ class StockPicking(models.Model):
             ])
             if not attachment:
                 raise UserError(_('Txt seur label not found'))
+            label = b64decode(attachment.datas)
             self.with_delay(priority=1).print_seur_document(
-                config, attachment.datas)
+                config, label)
 
     @job
     def print_seur_document(self, config, label):
