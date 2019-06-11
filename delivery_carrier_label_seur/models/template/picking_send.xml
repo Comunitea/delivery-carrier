@@ -31,6 +31,7 @@
                         <pais_consignatario>${cliente_pais}</pais_consignatario>
                         <email_consignatario>${cliente_email}</email_consignatario>
                         <telefono_consignatario>${cliente_telefono}</telefono_consignatario>
+                        <sms_consignatario>${cliente_movil}</sms_consignatario>
                         <atencion_de>${cliente_atencion}</atencion_de>
                         <test_preaviso>${aviso_preaviso}</test_preaviso>
                         <test_reparto>${aviso_reparto}</test_reparto>
@@ -39,6 +40,9 @@
                         <id_mercancia>${id_mercancia}</id_mercancia>
                         <nombre_remitente>${nombre_remitente}</nombre_remitente>
                         <direccion_remitente>${direccion_remitente}</direccion_remitente>
+                        <codPostal_remitente>${codPostal_remitente}</codPostal_remitente>
+                        <poblacion_remitente>${poblacion_remitente}</poblacion_remitente>
+                        <tipoVia_remitente>${tipoVia_remitente}</tipoVia_remitente>
                     </bulto>
                     </exp>
                 </root>

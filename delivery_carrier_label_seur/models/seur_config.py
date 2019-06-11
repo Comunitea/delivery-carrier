@@ -144,9 +144,13 @@ class SeurConfig(models.Model):
             'aviso_reparto': data.get('aviso_reparto', 'N'),
             'aviso_email': data.get('aviso_email', 'N'),
             'aviso_sms': data.get('aviso_sms', 'N'),
+            'cliente_movil': data.get('cliente_movil', ''),
             'id_mercancia': data.get('id_mercancia', ''),
             'nombre_remitente': data.get('nombre_remitente', ''),
             'direccion_remitente': data.get('direccion_remitente', ''),
+            'codPostal_remitente': data.get('codPostal_remitente', ''),
+            'poblacion_remitente': data.get('poblacion_remitente', ''),
+            'tipoVia_remitente': data.get('tipoVia_remitente', ''),
             }
         if not self.env.context.get('pdf'):
             vals['printer'] = self.env.context.get('printer', 'ZEBRA')

@@ -219,9 +219,7 @@ class StockPicking(models.Model):
             'cliente_movil':
             partner.mobile and unidecode(partner.mobile) or '',
             'cliente_atencion': unidecode(self.partner_id.name),
-            'id_mercancia': international and '400' or '',
-            'nombre_remitente': warehouse.partner_id.name,
-            'direccion_remitente': warehouse.partner_id.street,
+            'id_mercancia': international and '400' or ''
         }
         return data
 
