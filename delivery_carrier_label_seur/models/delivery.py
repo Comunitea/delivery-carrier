@@ -45,3 +45,9 @@ class DeliveryCarrier(models.Model):
         return res
 
     seur_config_id = fields.Many2one('seur.config', string='SEUR Config')
+
+    def get_tracking_link(self, pickings):
+        self.ensure_one()
+        if self.carrier_type == 'seur':
+            return ['https://www.seur.com/livetracking/?segOnlineIdentificador=%s' % x.carrier_tracking_ref for x in pickings if x.carrier_tracking_ref]
+        return super().get_tracking_link(pickings)
