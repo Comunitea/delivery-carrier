@@ -31,7 +31,6 @@ class DeliveryCarrier(models.Model):
         ('072', 'INTERNACIONAL A'),
         ('076', 'CLASSIC'),
         ('118', 'VINO')
-
     ]
 
     seur_service_code = fields.Selection(SEUR_SERVICES)

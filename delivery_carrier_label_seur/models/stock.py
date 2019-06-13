@@ -60,17 +60,17 @@ class StockPicking(models.Model):
         self.seur_product_code = carrier.seur_product_code
         return res
 
-    def check_zipcode(self):
-        if self._context.get('zip_checked'):
+    def check_zipcode(self, partner):
+        if self._context.get('zip_checked_%s' % partner.id):
             return
-        zipcode = (self.partner_id.zip and
-                   unidecode(self.partner_id.zip.replace(" ", "")) or
+        zipcode = (partner.zip and
+                   unidecode(partner.zip.replace(" ", "")) or
                    self.warn(_('ZIP'), _('partner')))
 
         if not self._context.get('zipdata'):
             config = self.carrier_id.seur_config_id
             zip_data = config.get_zip_data(zipcode)
-            if self.partner_id.city.lower() in \
+            if partner.city.lower() in \
                     [x['NOM_POBLACION'].lower() for x in zip_data]:
                 return
             action = self.env.ref(
@@ -78,7 +78,8 @@ class StockPicking(models.Model):
                 read()[0]
             action['context'] = {
                 'zip_data': zip_data,
-                'partner_id': self.partner_id.id
+                'partner_id': partner.id,
+                'picking_id': self.id
             }
             return action
 
@@ -122,7 +123,7 @@ class StockPicking(models.Model):
         return super(StockPicking, self)._check_tracking_status_cron()
 
     def action_generate_carrier_label(self):
-        action = self.check_zipcode()
+        action = self.check_zipcode(self.partner_id)
         if action:
             return action
         return super(StockPicking, self).action_generate_carrier_label()

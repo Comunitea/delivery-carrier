@@ -15,6 +15,12 @@ class ZipcodeSelectorWizard(models.TransientModel):
         return self._context.get('partner_id')
 
     @api.model
+    def _get_default_picking_id(self):
+        if 'picking_id' not in self._context:
+            raise UserError(_())
+        return self._context.get('picking_id')
+
+    @api.model
     def _get_default_zip_options(self):
         if 'zip_data' not in self._context:
             return []
@@ -24,16 +30,19 @@ class ZipcodeSelectorWizard(models.TransientModel):
                 (zipcode['NOM_POBLACION'], zipcode['NOM_POBLACION']))
         return default_zip_options
 
+    picking_id = fields.Many2one(
+        'stock.picking', 'Customer',
+        default=lambda self: self._get_default_picking_id())
     partner_id = fields.Many2one(
-        'res.partner', 'Customer', default=_get_default_partner_id)
+        'res.partner', 'Customer',
+        default=lambda self: self._get_default_partner_id())
     partner_city = fields.Char(
         'Delivery city', related='partner_id.city', readonly=True)
     city_name = fields.Selection(
-        _get_default_zip_options, string='Seur city')
+        lambda self: self._get_default_zip_options(), string='Seur city')
 
     def confirm(self):
         self.partner_id.city = self.city_name
-        picking = self.env['stock.picking'].browse(
-            self._context.get('active_id'))
-        return picking.with_context(
-            zip_checked=True).action_generate_carrier_label()
+        context = dict(self.env.context)
+        context['zip_checked_%s' % self.partner_id.id] = True
+        return self.picking_id.with_context(context).action_generate_carrier_label()
