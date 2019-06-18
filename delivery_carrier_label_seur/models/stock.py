@@ -214,9 +214,7 @@ class StockPicking(models.Model):
             'cliente_cpostal': unidecode(self.partner_id.zip.replace(" ", "")),
             'cliente_pais': unidecode(partner.country_id.code),
             'cliente_email': partner.email and unidecode(partner.email) or '',
-            'cliente_telefono': (partner.phone or partner.mobile) and
-            unidecode(partner.phone or partner.mobile) or '',
-            'cliente_fijo': partner.phone and unidecode(partner.phone) or '',
+            'cliente_telefono': partner.phone and unidecode(partner.phone) or '',
             'cliente_movil':
             partner.mobile and unidecode(partner.mobile) or '',
             'cliente_atencion': unidecode(self.partner_id.name),

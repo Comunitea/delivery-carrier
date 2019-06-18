@@ -519,3 +519,8 @@ msgstr ""
 #: model:ir.ui.view,arch_db:base_delivery_carrier_label.delivery_carrier_template_option_view_tree
 msgid "delivery_carrier_option"
 msgstr "delivery_carrier_option"
+
+#. module: base_delivery_carrier_label
+#: model:ir.model.fields,field_description:base_delivery_carrier_label.field_stock_picking_recreate_picking_label
+msgid "Recreate picking label"
+msgstr "Volver a crear etiqueta de envío"
