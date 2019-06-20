@@ -386,3 +386,15 @@ msgstr "seur.config"
 #: model:ir.model,name:delivery_carrier_label_seur.model_zipcode_selector_wizard
 msgid "zipcode.selector.wizard"
 msgstr "zipcode.selector.wizard"
+
+#. module: delivery_carrier_label_seur
+#: model:ir.model.fields,field_description:delivery_carrier_label_seur.field_delivery_carrier_seur_service_code
+#: model:ir.model.fields,field_description:delivery_carrier_label_seur.field_stock_picking_seur_service_code
+msgid "Seur service code"
+msgstr "Código de servicio de seur"
+
+#. module: delivery_carrier_label_seur
+#: model:ir.model.fields,field_description:delivery_carrier_label_seur.field_delivery_carrier_seur_product_code
+#: model:ir.model.fields,field_description:delivery_carrier_label_seur.field_stock_picking_seur_product_code
+msgid "Seur product code"
+msgstr "Código de producto de seur"

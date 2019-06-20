@@ -10,8 +10,8 @@
                 <group attrs="{'invisible': [('state', '!=', 'init')]}">
                     <field name="carrier_id"/>
                     <field name="carrier_type"/>
-                    <field name="from_date"/>
-                    <field name="to_date"/>
+                    <field name="from_date" widget="date"/>
+                    <field name="to_date" invisible="1"/>
                 </group>
                 <group attrs="{'invisible': [('state', '!=', 'file')]}">
                     <field name="file_out" filename="filename"/>
