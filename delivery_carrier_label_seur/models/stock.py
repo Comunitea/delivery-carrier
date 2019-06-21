@@ -195,7 +195,7 @@ class StockPicking(models.Model):
             'total_bultos': self.number_of_packages or '1',
             'total_kilos': self.weight or '1',
             'peso_bulto': self.weight or '1',
-            'observaciones': self.note and unidecode(self.note) or '',
+            'observaciones': self.observations and unidecode(self.observations) or '',
             'referencia_expedicion': unidecode(self.name),
             'ref_bulto': '',
             'clave_portes': 'F',
