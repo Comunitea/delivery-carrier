@@ -55,7 +55,7 @@
             <imp:in3>${printer_model}</imp:in3>
             <imp:in4>${ecb_code}</imp:in4>
             <imp:in5>
-                <![CDATA[<?xml version="1.0" encoding="ISO-8859-1"?>
+                <![CDATA[<?xml version="1.0" encoding="UTF-8"?>
                     ${Bulto()}
                 ]]>
             </imp:in5>
