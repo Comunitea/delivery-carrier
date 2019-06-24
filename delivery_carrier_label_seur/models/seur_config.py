@@ -117,7 +117,7 @@ class SeurConfig(models.Model):
             'ccc': self.accounting_code,
             'servicio': data.get('servicio', '1'),
             'product': data.get('product', '2'),
-            'total_bultos': data.get('total_bultos', '1'),
+            'total_bultos': data.get('total_bultos', 1),
             'total_kilos': data.get('total_kilos', '1'),
             'peso_bulto': data.get('peso_bulto', '1'),
             'observaciones': data.get('observaciones', ''),
@@ -160,7 +160,7 @@ class SeurConfig(models.Model):
 
         url = 'http://cit.seur.com/CIT-war/services/ImprimirECBWebService'
         xml = tmpl.generate(**vals).render()
-        xml = xml.encode('UTF-8')
+        xml = xml.encode('utf8')
         result = self.connect(url, xml)
         if not result:
             return reference, label, 'timed out'
