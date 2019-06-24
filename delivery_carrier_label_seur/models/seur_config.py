@@ -160,7 +160,7 @@ class SeurConfig(models.Model):
 
         url = 'http://cit.seur.com/CIT-war/services/ImprimirECBWebService'
         xml = tmpl.generate(**vals).render()
-        xml = xml.encode('UTF-8')
+        xml = xml.encode('ISO-8859-1')
         result = self.connect(url, xml)
         if not result:
             return reference, label, 'timed out'

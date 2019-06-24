@@ -204,8 +204,8 @@ class StockPicking(models.Model):
             international = True
 
         # Si son varios bultos hay que dividir el peso
-        peso_total = self.weight or 1
-        total_bultos = self.number_of_packages or 1
+        peso_total = self.pick_weight or 1
+        total_bultos = self.pick_packages or 1
         peso_bulto = round(peso_total / total_bultos, 2)
 
         data = {
