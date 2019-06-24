@@ -203,17 +203,17 @@ class StockPicking(models.Model):
                 country_id.code:
             international = True
 
-        # Si son varios bultos hay que dividir el peso
-        peso_total = self.pick_weight or 1
-        total_bultos = self.pick_packages or 1
-        peso_bulto = round(peso_total / total_bultos, 2)
+        # Datos sobreescritos en jim_addons/jim_stock/models/stock.py:
+        # total_bultos, total_kilos, peso_bulto
+        # Si es un documento neutro también se sobreescribe:
+        # nombre_remitente, direccion_remitente, codPostal_remitente, poblacion_remitente, tipoVia_remitente
 
         data = {
             'servicio': unidecode(self.seur_service_code),
             'product': unidecode(self.seur_product_code),
-            'total_bultos': str(total_bultos),
-            'total_kilos': str(peso_total),
-            'peso_bulto': str(peso_bulto),
+            'total_bultos': self.number_of_packages or 1,
+            'total_kilos': self.weight or 1,
+            'peso_bulto': self.weight or 1,
             'observaciones': self.note and unidecode(self.note) or '',
             'referencia_expedicion': unidecode(self.name),
             'ref_bulto': '',
