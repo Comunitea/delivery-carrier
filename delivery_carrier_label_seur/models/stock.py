@@ -173,11 +173,24 @@ class StockPicking(models.Model):
         else:
             return False
 
-    def _get_label_data(self):
-        partner = self.partner_id
+    def _validateSeurData(self):
+        if not self.partner_id:
+            raise UserError(_('Partner is required to generate Seur label'))
+        if not self.partner_id.street and not self.partner_id.street2:
+            raise UserError(_('Partner street is required to generate Seur label'))
+        if not self.partner_id.city:
+            raise UserError(_('Partner city is required to generate Seur label'))
+        if not self.partner_id.zip:
+            raise UserError(_('Partner zip code is required to generate Seur label'))
+        if not self.partner_id.country_id:
+            raise UserError(_('Partner country is required to generate Seur label'))
         if not self.seur_service_code or not self.seur_product_code:
-            raise UserError(_(
-                'Please select SEUR service and product codes in picking'))
+            raise UserError(_('Please select Seur service and product in picking'))
+
+    def _get_label_data(self):
+        self._validateSeurData()
+
+        partner = self.partner_id
         international = False
         warehouse = self.picking_type_id and \
             self.picking_type_id.warehouse_id or False
@@ -189,12 +202,18 @@ class StockPicking(models.Model):
             self.partner_id.country_id.code != warehouse.partner_id.\
                 country_id.code:
             international = True
+
+        # Si son varios bultos hay que dividir el peso
+        peso_total = self.weight or 1
+        total_bultos = self.number_of_packages or 1
+        peso_bulto = round(peso_total / total_bultos, 2)
+
         data = {
             'servicio': unidecode(self.seur_service_code),
             'product': unidecode(self.seur_product_code),
-            'total_bultos': self.number_of_packages or '1',
-            'total_kilos': self.weight or '1',
-            'peso_bulto': self.weight or '1',
+            'total_bultos': str(total_bultos),
+            'total_kilos': str(peso_total),
+            'peso_bulto': str(peso_bulto),
             'observaciones': self.note and unidecode(self.note) or '',
             'referencia_expedicion': unidecode(self.name),
             'ref_bulto': '',
