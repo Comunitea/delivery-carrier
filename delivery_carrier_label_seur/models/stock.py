@@ -50,6 +50,23 @@ class StockPicking(models.Model):
     def _get_seur_products(self):
         return self.env['delivery.carrier'].SEUR_PRODUCTS
 
+    @api.model
+    def create(self, vals):
+        if vals.get('carrier_id'):
+            carrier = self.env['delivery.carrier'].browse(vals['carrier_id'])
+            if carrier.carrier_type == 'seur':
+                vals['seur_service_code'] = carrier.seur_service_code
+                vals['seur_product_code'] = carrier.seur_product_code
+        return super(StockPicking, self).create(vals)
+
+    def write(self, vals):
+        if vals.get('carrier_id'):
+            carrier = self.env['delivery.carrier'].browse(vals['carrier_id'])
+            if carrier.carrier_type == 'seur':
+                vals['seur_service_code'] = carrier.seur_service_code
+                vals['seur_product_code'] = carrier.seur_product_code
+        return super(StockPicking, self).write(vals)
+
     @api.onchange('carrier_id')
     def carrier_id_change(self):
         res = super(StockPicking, self).carrier_id_change()
@@ -70,7 +87,7 @@ class StockPicking(models.Model):
         if not self._context.get('zipdata'):
             config = self.carrier_id.seur_config_id
             zip_data = config.get_zip_data(zipcode)
-            if partner.city.lower() in \
+            if partner.city and partner.city.lower() in \
                     [x['NOM_POBLACION'].lower() for x in zip_data]:
                 return
             action = self.env.ref(
@@ -173,11 +190,24 @@ class StockPicking(models.Model):
         else:
             return False
 
-    def _get_label_data(self):
-        partner = self.partner_id
+    def _validateSeurData(self):
+        if not self.partner_id:
+            raise UserError(_('Partner is required to generate Seur label'))
+        if not self.partner_id.street and not self.partner_id.street2:
+            raise UserError(_('Partner street is required to generate Seur label'))
+        if not self.partner_id.city:
+            raise UserError(_('Partner city is required to generate Seur label'))
+        if not self.partner_id.zip:
+            raise UserError(_('Partner zip code is required to generate Seur label'))
+        if not self.partner_id.country_id:
+            raise UserError(_('Partner country is required to generate Seur label'))
         if not self.seur_service_code or not self.seur_product_code:
-            raise UserError(_(
-                'Please select SEUR service and product codes in picking'))
+            raise UserError(_('Please select Seur service and product in picking'))
+
+    def _get_label_data(self):
+        self._validateSeurData()
+
+        partner = self.partner_id
         international = False
         warehouse = self.picking_type_id and \
             self.picking_type_id.warehouse_id or False
@@ -189,12 +219,18 @@ class StockPicking(models.Model):
             self.partner_id.country_id.code != warehouse.partner_id.\
                 country_id.code:
             international = True
+
+        # Datos sobreescritos en jim_addons/jim_stock/models/stock.py:
+        # total_bultos, total_kilos, peso_bulto
+        # Si es un documento neutro también se sobreescribe:
+        # nombre_remitente, direccion_remitente, codPostal_remitente, poblacion_remitente, tipoVia_remitente
+
         data = {
             'servicio': unidecode(self.seur_service_code),
             'product': unidecode(self.seur_product_code),
-            'total_bultos': self.number_of_packages or '1',
-            'total_kilos': self.weight or '1',
-            'peso_bulto': self.weight or '1',
+            'total_bultos': self.number_of_packages or 1,
+            'total_kilos': self.weight or 1,
+            'peso_bulto': self.weight or 1,
             'observaciones': self.note and unidecode(self.note) or '',
             'referencia_expedicion': unidecode(self.name),
             'ref_bulto': '',
