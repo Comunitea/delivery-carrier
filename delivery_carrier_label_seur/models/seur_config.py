@@ -117,7 +117,7 @@ class SeurConfig(models.Model):
             'ccc': self.accounting_code,
             'servicio': data.get('servicio', '1'),
             'product': data.get('product', '2'),
-            'total_bultos': data.get('total_bultos', 1),
+            'total_bultos': data.get('total_bultos', '1'),
             'total_kilos': data.get('total_kilos', '1'),
             'peso_bulto': data.get('peso_bulto', '1'),
             'observaciones': data.get('observaciones', ''),
