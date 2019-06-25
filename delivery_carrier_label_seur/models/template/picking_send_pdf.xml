@@ -46,7 +46,7 @@
             <imp:in0>${username}</imp:in0>
             <imp:in1>${password}</imp:in1>
             <imp:in2>
-                <![CDATA[<?xml version="1.0" encoding="ISO-8859-1"?>
+                <![CDATA[<?xml version="1.0" encoding="UTF-8"?>
                         ${Bulto()}
                 ]]>
             </imp:in2>
