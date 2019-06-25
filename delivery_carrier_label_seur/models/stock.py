@@ -87,7 +87,7 @@ class StockPicking(models.Model):
         if not self._context.get('zipdata'):
             config = self.carrier_id.seur_config_id
             zip_data = config.get_zip_data(zipcode)
-            if partner.city.lower() in \
+            if partner.city and partner.city.lower() in \
                     [x['NOM_POBLACION'].lower() for x in zip_data]:
                 return
             action = self.env.ref(
