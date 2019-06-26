@@ -150,7 +150,8 @@ class StockPicking(models.Model):
         self.ensure_one()
         if not self.carrier_id.seur_config_id:
             raise UserError(_('No SEUR Config defined in carrier'))
-        if not self.picking_type_id.warehouse_id.partner_id:
+        if self.picking_type_id.warehouse_id and not \
+                self.picking_type_id.warehouse_id.partner_id:
             raise UserError(
                 _('Please define an address in the %s warehouse') % (
                     self.warehouse_id.name))
@@ -211,6 +212,8 @@ class StockPicking(models.Model):
         international = False
         warehouse = self.picking_type_id and \
             self.picking_type_id.warehouse_id or False
+        if not warehouse:
+            warehouse = self.env.user.company_id.warehouse_id
 
         if self.partner_id and self.partner_id.country_id and \
             self.partner_id.country_id.code and warehouse and \
