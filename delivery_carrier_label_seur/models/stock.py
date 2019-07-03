@@ -194,6 +194,8 @@ class StockPicking(models.Model):
     def _validateSeurData(self):
         if not self.partner_id:
             raise UserError(_('Partner is required to generate Seur label'))
+        if not self.partner_id.name:
+            raise UserError(_('Partner name is required to generate Seur label'))
         if not self.partner_id.street and not self.partner_id.street2:
             raise UserError(_('Partner street is required to generate Seur label'))
         if not self.partner_id.city:

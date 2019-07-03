@@ -420,3 +420,9 @@ msgstr "seur.config"
 #: model:ir.model,name:delivery_carrier_label_seur.model_zipcode_selector_wizard
 msgid "zipcode.selector.wizard"
 msgstr "zipcode.selector.wizard"
+
+#. module: delivery_carrier_label_seur
+#: code:addons/delivery_carrier_label_seur/models/stock.py:198
+#, python-format
+msgid "Partner name is required to generate Seur label"
+msgstr "¡El nombre del cliente no está definido!"
