@@ -283,6 +283,8 @@ class SeurConfig(models.Model):
         if not result:
             return []
         # -_-
+        # -_- * 1000 + WTF a veces viene en minusculas, otras en mayusculas
+        result = result.replace('ISO-8859-1', 'UTF-8')
         result = result.replace('iso-8859-1', 'UTF-8')
         dom = parseString(result.decode())
         info = dom.getElementsByTagName('ns1:out')
