@@ -48,9 +48,6 @@ class SeurConfig(models.Model):
 
             Return XML object
         """
-        print("############################ SEUR LABEL ############################")
-        print(xml)
-        print("########################## SEUR LABEL END ##########################")
         headers = {}
         request = urllib2.Request(url, xml, headers)
         try:
