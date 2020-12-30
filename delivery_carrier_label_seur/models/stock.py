@@ -140,9 +140,10 @@ class StockPicking(models.Model):
         return super(StockPicking, self)._check_tracking_status_cron()
 
     def action_generate_carrier_label(self):
-        action = self.check_zipcode(self.partner_id)
-        if action:
-            return action
+        # Los códigos postales sólo se comprueban para España según indicaciones de Seur
+        if self.partner_id and self.partner_id.country_id and self.partner_id.country_id.code == 'ES':
+            action = self.check_zipcode(self.partner_id)
+            if action: return action
         return super(StockPicking, self).action_generate_carrier_label()
 
     @api.multi
