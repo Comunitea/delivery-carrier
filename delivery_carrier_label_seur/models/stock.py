@@ -140,9 +140,10 @@ class StockPicking(models.Model):
         return super(StockPicking, self)._check_tracking_status_cron()
 
     def action_generate_carrier_label(self):
-        action = self.check_zipcode(self.partner_id)
-        if action:
-            return action
+        # Los códigos postales sólo se comprueban para España según indicaciones de Seur
+        if self.partner_id and self.partner_id.country_id and self.partner_id.country_id.code == 'ES':
+            action = self.check_zipcode(self.partner_id)
+            if action: return action
         return super(StockPicking, self).action_generate_carrier_label()
 
     @api.multi
@@ -194,6 +195,8 @@ class StockPicking(models.Model):
     def _validateSeurData(self):
         if not self.partner_id:
             raise UserError(_('Partner is required to generate Seur label'))
+        if not self.partner_id.name:
+            raise UserError(_('Partner name is required to generate Seur label'))
         if not self.partner_id.street and not self.partner_id.street2:
             raise UserError(_('Partner street is required to generate Seur label'))
         if not self.partner_id.city:
@@ -252,7 +255,7 @@ class StockPicking(models.Model):
             'cliente_poblacion': partner.city,
             'cliente_cpostal': unidecode(self.partner_id.zip.replace(" ", "")),
             'cliente_pais': unidecode(partner.country_id.code),
-            'cliente_email': partner.email and unidecode(partner.email) or '',
+            'cliente_email': partner.email and unidecode(partner.email.split(';')[0]) or '',
             'cliente_telefono': partner.phone and unidecode(partner.phone) or '',
             'cliente_movil':
             partner.mobile and unidecode(partner.mobile) or '',
