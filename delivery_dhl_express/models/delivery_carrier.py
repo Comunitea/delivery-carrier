@@ -103,28 +103,28 @@ class DeliveryCarrier(models.Model):
         return "https://mydhl.express.dhl/es/es/tracking.html#/results?id={}".format(
             picking.carrier_tracking_ref
         )
-    
+
     def get_message_reference(self, stringLength=8):
         lettersAndDigits = string.ascii_letters + string.digits
         return "".join((random.choice(lettersAndDigits) for i in range(stringLength)))
-    
+
     def dhl_express_send_shipping(self, pickings):
         return [self.dhl_express_create_shipping(p) for p in pickings]
-    
+
     def dhl_express_create_shipping(self, picking):
         dhl_express_request = DHLExpressRequest(self)
         vals = self._prepare_dhl_express_shipping(picking)
         response = dhl_express_request._send_shipping(vals)
         vals.update({"tracking_number": False, "exact_price": 0})
-        
+
         if "ShipmentResponse" in response.json():
             response = response.json()["ShipmentResponse"]
             if "ShipmentIdentificationNumber" not in response:
                 raise UserError(
                     "Error: {}".format(response["Notification"][0]["Message"])
                 )
-            picking.carrier_tracking_ref = response["ShipmentIdentificationNumber"]
-            vals["tracking_number"] = response["ShipmentIdentificationNumber"]
+            picking.carrier_tracking_ref = "{}".format(response["ShipmentIdentificationNumber"])
+            vals["tracking_number"] = "{}".format(response["ShipmentIdentificationNumber"])
 
             if response["LabelImage"]:
                 if picking.carrier_id.dhl_express_file_format == "pdf":
@@ -149,7 +149,7 @@ class DeliveryCarrier(models.Model):
                             "mimetype": "text/plain",
                         }
                     )
-                
+
                 if attachment_id:
                     msg = _("Label(s) retrieved from DHL EXpress.")
                     picking.message_post(body=msg, attachment_ids=[attachment_id.id])
@@ -161,7 +161,7 @@ class DeliveryCarrier(models.Model):
                         package["TrackingNumber"]
                     )
                 picking.write({"dhl_express_shipment_reference": shipment_reference})
-            
+
             pickup_requested = self.env["ir.config_parameter"].sudo().get_param("delivery_dhl_express.pickup_requested", False)
 
             if not pickup_requested or pickup_requested == "False":
@@ -169,7 +169,7 @@ class DeliveryCarrier(models.Model):
             return vals
         else:
             raise UserError("Error processing the response: {}".format(response))
-    
+
     def _prepare_dhl_express_shipping(self, picking):
         self.ensure_one()
         receiving_partner = picking.partner_id
@@ -196,10 +196,10 @@ class DeliveryCarrier(models.Model):
                 or False
             )
             inv_number = picking.sale_id.name
-        
+
         RequestedPackages = []
         # Picking field: notas.
-        picking_packages = 1        
+        picking_packages = 1
         for package in picking.package_ids:
             package_info = {
                 "@number": picking_packages,
@@ -213,7 +213,7 @@ class DeliveryCarrier(models.Model):
             }
             RequestedPackages.append(package_info)
             picking_packages += 1
-        
+
         DocumentImage = []
         for pdf_invoice in pdf_invoices:
             DocumentImage.append({
@@ -226,7 +226,7 @@ class DeliveryCarrier(models.Model):
             ("res_model", "=", picking._name),
             ("res_id", "=", picking.id),
             ("type", "=", "binary"),
-        ])        
+        ])
 
         for attachment_id in attachment_ids.filtered(lambda x: "Label: " not in x.name):
             DocumentImage.append({
@@ -234,7 +234,7 @@ class DeliveryCarrier(models.Model):
                 "DocumentImage": "%s" % base64.b64encode(attachment_id.datas).decode("utf8") if attachment_id.datas else False,
                 "DocumentImageFormat": "PDF",
             })
-        
+
         DocumentImages = {
             "DocumentImage": DocumentImage
         }
@@ -255,30 +255,30 @@ class DeliveryCarrier(models.Model):
             }
             ExportLineItem.append(move_info)
             item_number += 1
-        
+
         ExportLineItems = {
             'ExportLineItem': ExportLineItem
         }
-        
+
         Service = []
-        
+
         if self.dhl_express_plt_service:
             Service.append({
                 "ServiceType": "WY",
             })
-        
+
         if self.dhl_express_customs_duty or (picking.sale_id.pricelist_id.dhl_express_ddp and receiving_partner.country_id.code == 'US'):
             Service.append({
                 "ServiceType": "DD",
             })
-        
+
         SpecialServices = []
-        
-        if len(Service):        
+
+        if len(Service):
             SpecialServices = {
                 "Service": Service
             }
-        
+
         pickup_requested = self.env["ir.config_parameter"].sudo().get_param("delivery_dhl_express.pickup_requested", False)
         dhl_service = self.dhl_express_service
 
@@ -410,7 +410,7 @@ class DeliveryCarrier(models.Model):
 
         if receiving_partner.country_id.code != "ES":
             payload["ShipmentRequest"]["RequestedShipment"]["InternationalDetail"]["Commodities"]["CustomsValue"] = round(picking.sale_id.amount_total, 3)
-        
+
         services = picking.sale_id.order_line.filtered(lambda x: x.product_id.type == 'service')
         if services:
             OtherCharge = []
@@ -439,9 +439,9 @@ class DeliveryCarrier(models.Model):
                 payload["ShipmentRequest"]["RequestedShipment"]["InternationalDetail"]["ExportDeclaration"]["OtherCharges"] = {
                     'OtherCharge': OtherCharge
                 }
-        
+
         return payload
-    
+
     # This method only cancels pickups not ShipmentRequests, so it's useless at the moment.
     def dhl_express_cancel_shipment(self, pickings):
         for picking in pickings.filtered("dhl_express_shipment_reference"):
@@ -469,7 +469,7 @@ class DeliveryCarrier(models.Model):
                 picking.message_post(body=msg)
                 continue """
 
-    
+
     def _prepare_dhl_express_cancel(self, picking):
         self.ensure_one()
         payload = {
@@ -486,15 +486,15 @@ class DeliveryCarrier(models.Model):
                 }
             }
         }
-        
+
         return payload
-    
+
     def dhl_express_tracking_state_update(self, picking):
         """Tracking state update"""
         self.ensure_one()
         if not picking.carrier_tracking_ref:
             return
-        
+
         dhl_express_request = DHLExpressRequest(self)
         payload = self._prepare_dhl_express_tracking(picking)
         response = dhl_express_request._get_tracking_states(payload)
@@ -520,7 +520,7 @@ class DeliveryCarrier(models.Model):
                     )
                 )
                 return
-    
+
     def _prepare_dhl_express_tracking(self, picking):
         self.ensure_one()
         payload = {
