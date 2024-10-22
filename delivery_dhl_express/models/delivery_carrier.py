@@ -130,7 +130,7 @@ class DeliveryCarrier(models.Model):
                 if picking.carrier_id.dhl_express_file_format == "pdf":
                     attachment_id = self.env["ir.attachment"].create(
                         {
-                            "name": "Label: {}".format(picking.name),
+                            "name": "dhl_label: {}".format(picking.name),
                             "type": "binary",
                             "datas": response["LabelImage"][0]["GraphicImage"],
                             "res_model": picking._name,
@@ -141,7 +141,7 @@ class DeliveryCarrier(models.Model):
                 else:
                     attachment_id = self.env["ir.attachment"].create(
                         {
-                            "name": "Label: {}.{}".format(picking.name, response["LabelImage"][0]["LabelImageFormat"]),
+                            "name": "dhl_label: {}.{}".format(picking.name, response["LabelImage"][0]["LabelImageFormat"]),
                             "type": "binary",
                             "datas": response["LabelImage"][0]["GraphicImage"],
                             "res_model": picking._name,
